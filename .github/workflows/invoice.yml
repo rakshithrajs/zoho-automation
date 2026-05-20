@@ -1,0 +1,44 @@
+name: Weekly Invoice Automation
+
+on:
+    workflow_dispatch:
+
+jobs:
+    run-invoice:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@v5
+
+            - name: Install dependencies
+              run: uv sync
+
+            - name: Run invoice automation
+              env:
+                  ZOHO_BASE_URL: ${{ secrets.ZOHO_BASE_URL }}
+                  ZOHO_ACCOUNTS_URL: ${{ secrets.ZOHO_ACCOUNTS_URL }}
+                  ZOHO_ORG_ID: ${{ secrets.ZOHO_ORG_ID }}
+                  ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
+                  ZOHO_CLIENT_SECRET: ${{ secrets.ZOHO_CLIENT_SECRET }}
+                  ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
+                  ZOHO_CUSTOMER_ID: ${{ secrets.ZOHO_CUSTOMER_ID }}
+                  ZOHO_CODE: ${{ secrets.ZOHO_CODE }}
+                  USD_AMOUNT: ${{ secrets.USD_AMOUNT }}
+                  LINE_ITEM_NAME: ${{ secrets.LINE_ITEM_NAME }}
+                  EXCHANGE_API_URL: ${{ secrets.EXCHANGE_API_URL }}
+                  SMTP_HOST: ${{ secrets.SMTP_HOST }}
+                  SMTP_PORT: ${{ secrets.SMTP_PORT }}
+                  GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
+                  GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+                  EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+                  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+              run: uv run main.py

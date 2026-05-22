@@ -2,6 +2,11 @@ name: Weekly Invoice Automation
 
 on:
     workflow_dispatch:
+        inputs:
+            inr_amount:
+                description: "Invoice amount in INR"
+                required: true
+                type: string
 
 jobs:
     run-invoice:
@@ -32,9 +37,7 @@ jobs:
                   ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
                   ZOHO_CUSTOMER_ID: ${{ secrets.ZOHO_CUSTOMER_ID }}
                   ZOHO_CODE: ${{ secrets.ZOHO_CODE }}
-                  USD_AMOUNT: ${{ secrets.USD_AMOUNT }}
                   LINE_ITEM_NAME: ${{ secrets.LINE_ITEM_NAME }}
-                  EXCHANGE_API_URL: ${{ secrets.EXCHANGE_API_URL }}
                   SMTP_HOST: ${{ secrets.SMTP_HOST }}
                   SMTP_PORT: ${{ secrets.SMTP_PORT }}
                   GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
@@ -42,4 +45,4 @@ jobs:
                   EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
                   TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
                   TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-              run: uv run main.py
+              run: uv run main.py "${{ inputs.inr_amount }}"

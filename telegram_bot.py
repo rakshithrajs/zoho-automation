@@ -29,11 +29,12 @@ def _authorized(user_id: Optional[int]) -> bool:
 
 async def start(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        "Hi! Send /invoice to generate this week's invoice and get the PDF here."
+        "Hi! Send /invoice <amount in INR> to generate an invoice and get the PDF here.\n"
+        "Example: /invoice 30000"
     )
 
 
-async def invoice(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+async def invoice(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     chat = update.effective_chat
     if not _authorized(user.id if user else None):
@@ -41,11 +42,28 @@ async def invoice(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
         log.warning("Rejected /invoice from unauthorized user %s", user)
         return
 
+    inr_amount: Optional[float] = None
+    if ctx.args:
+        try:
+            inr_amount = float(ctx.args[0].replace(",", ""))
+            if inr_amount <= 0:
+                raise ValueError("amount must be positive")
+        except ValueError:
+            await update.message.reply_text(
+                "Invalid amount. Usage: /invoice <amount in INR>, e.g. /invoice 30000"
+            )
+            return
+
     try:
-        result = run_pipeline()
+        result = run_pipeline(inr_amount=inr_amount)
         with result.pdf_path.open("rb") as fh:
             await chat.send_document(document=fh, filename=result.pdf_path.name)
-        log.info("Sent invoice %s to chat %s", result.invoice_number, chat.id)
+        log.info(
+            "Sent invoice %s (INR %.2f) to chat %s",
+            result.invoice_number,
+            result.amount_inr,
+            chat.id,
+        )
     except Exception as exc:
         log.exception("Bot /invoice failed")
         await update.message.reply_text(f"Workflow failed:\n{exc}")

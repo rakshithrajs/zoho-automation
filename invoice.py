@@ -21,7 +21,6 @@ class InvoiceResult:
     invoice_id: str
     invoice_number: str
     amount_inr: float
-    exchange_rate: float
     invoice_date: str
     pdf_path: Path
 
@@ -57,11 +56,10 @@ class ZohoInvoiceClient:
 
     def create_invoice(
         self,
-        usd_amount: float,
-        exchange_rate: float,
+        inr_amount: float,
         line_item_name: str,
     ) -> dict:
-        inr_amount = round(usd_amount * exchange_rate, 2)
+        inr_amount = round(inr_amount, 2)
         today = datetime.now().strftime("%Y-%m-%d")
         payload = {
             "customer_id": self._cfg.customer_id,
@@ -70,10 +68,7 @@ class ZohoInvoiceClient:
             "line_items": [
                 {"name": line_item_name, "rate": inr_amount, "quantity": 1}
             ],
-            "notes": (
-                f"Auto-generated invoice. USD amount: {usd_amount}; "
-                f"USD→INR rate: {exchange_rate}; INR total: {inr_amount}."
-            ),
+            "notes": f"Auto-generated invoice. INR total: {inr_amount}.",
         }
 
         resp = self._request("POST", "/invoices", json=payload)
@@ -87,11 +82,10 @@ class ZohoInvoiceClient:
             raise RuntimeError(f"Unexpected invoice response: {resp.text}")
 
         log.info(
-            "Invoice created | id=%s number=%s amount_inr=%s rate=%s",
+            "Invoice created | id=%s number=%s amount_inr=%s",
             invoice["invoice_id"],
             invoice.get("invoice_number"),
             inr_amount,
-            exchange_rate,
         )
         invoice["_inr_amount"] = inr_amount
         invoice["_invoice_date"] = today

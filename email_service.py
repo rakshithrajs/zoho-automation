@@ -18,7 +18,6 @@ def send_invoice_email(
     invoice_number: str,
     invoice_date: str,
     amount_inr: float,
-    exchange_rate: float,
 ) -> None:
     """Email the invoice PDF to the configured recipient."""
     if not pdf_path.exists():
@@ -31,7 +30,7 @@ def send_invoice_email(
     msg.set_content(
         "Hi,\n\n"
         f"Attached is the weekly invoice {invoice_number} dated {invoice_date}.\n"
-        f"Amount: INR {amount_inr:.2f} (USD→INR rate used: {exchange_rate}).\n\n"
+        f"Amount: INR {amount_inr:.2f}.\n\n"
         "— Zoho Automation"
     )
 

@@ -54,9 +54,8 @@ class AppConfig:
     zoho: ZohoConfig
     email: EmailConfig
     telegram: TelegramConfig
-    usd_amount: float
+    inr_amount: float
     line_item_name: str
-    exchange_api_url: str
 
 
 def load_config() -> AppConfig:
@@ -84,9 +83,6 @@ def load_config() -> AppConfig:
         zoho=zoho,
         email=email,
         telegram=telegram,
-        usd_amount=float(os.getenv("USD_AMOUNT", "350")),
+        inr_amount=float(os.getenv("INR_AMOUNT", "30000")),
         line_item_name=os.getenv("LINE_ITEM_NAME", "Weekly Development Work"),
-        exchange_api_url=os.getenv(
-            "EXCHANGE_API_URL", "https://api.frankfurter.app/latest?from=USD&to=INR"
-        ),
     )

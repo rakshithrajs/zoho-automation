@@ -32,7 +32,6 @@ def send_invoice_telegram(
     invoice_number: str,
     invoice_date: str,
     amount_inr: float,
-    exchange_rate: float,
 ) -> None:
     """Send the invoice PDF as a Telegram document with a summary caption."""
     if not pdf_path.exists():
@@ -41,8 +40,7 @@ def send_invoice_telegram(
     caption = (
         f"Invoice {invoice_number}\n"
         f"Date: {invoice_date}\n"
-        f"Amount: INR {amount_inr:.2f}\n"
-        f"USD→INR rate: {exchange_rate}"
+        f"Amount: INR {amount_inr:.2f}"
     )
 
     asyncio.run(_send(cfg, pdf_path, caption))
